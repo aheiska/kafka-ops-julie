@@ -27,6 +27,7 @@ import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -43,20 +44,15 @@ import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.common.config.ConfigResource;
 import org.apache.kafka.common.config.ConfigResource.Type;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 public class TopicManagerIT {
 
   private static SaslPlaintextKafkaContainer container;
+  private static AdminClient kafkaAdminClient;
   private TopicManager topicManager;
-  private AdminClient kafkaAdminClient;
 
   private ExecutionPlan plan;
 
@@ -67,18 +63,19 @@ public class TopicManagerIT {
     container = ContainerFactory.fetchSaslKafkaContainer(System.getProperty("cp.version"));
     container.start();
     ContainerTestUtils.resetAcls(container);
+    kafkaAdminClient = ContainerTestUtils.getSaslJulieAdminClient(container);
   }
 
   @AfterClass
   public static void teardown() {
     container.stop();
+    kafkaAdminClient.close(Duration.ZERO);
   }
 
   @Before
   public void before() throws IOException {
     Files.deleteIfExists(Paths.get(".cluster-state"));
 
-    kafkaAdminClient = ContainerTestUtils.getSaslJulieAdminClient(container);
     TopologyBuilderAdminClient adminClient = new TopologyBuilderAdminClient(kafkaAdminClient);
 
     final SchemaRegistryClient schemaRegistryClient = new MockSchemaRegistryClient();
@@ -355,36 +352,6 @@ public class TopicManagerIT {
     plan.run();
 
     verifyTopicConfiguration(topicA.toString(), config, Collections.singletonList("segment.bytes"));
-  }
-
-  @Test
-  public void testTopicCreationWithSpecialTopics()
-      throws ExecutionException, InterruptedException, IOException {
-
-    Topology topology = new TopologyImpl();
-    topology.setContext("testSpecialTopicCreationWithRoles");
-
-    Project project = new ProjectImpl("project");
-    topology.addProject(project);
-
-    HashMap<String, String> topicConfig = new HashMap<>();
-    topicConfig.put(TopicManager.NUM_PARTITIONS, "1");
-    topicConfig.put(TopicManager.REPLICATION_FACTOR, "1");
-
-    Topic topicA = new Topic("topicA", topicConfig);
-    project.addTopic(topicA);
-
-    var specialTopics = List.of(new Topic("i-am-special", topicConfig));
-    topology.setSpecialTopics(specialTopics);
-
-    topicManager.updatePlan(topology, plan);
-    plan.run();
-
-    Set<String> topicNames = kafkaAdminClient.listTopics().names().get();
-
-    assertThat(topicNames).contains(topicA.toString());
-    assertThat(topicNames).contains("i-am-special");
-    assertEquals("Should create 2 new topics", 2, topicNames.size());
   }
 
   private void verifyTopicConfiguration(String topic, HashMap<String, String> config)

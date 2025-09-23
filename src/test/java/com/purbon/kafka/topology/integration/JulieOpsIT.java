@@ -8,6 +8,7 @@ import com.purbon.kafka.topology.integration.containerutils.ContainerTestUtils;
 import com.purbon.kafka.topology.integration.containerutils.SaslPlaintextKafkaContainer;
 import com.purbon.kafka.topology.utils.TestUtils;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.kafka.clients.admin.AdminClient;
@@ -89,5 +90,7 @@ public class JulieOpsIT {
     assert topics.contains("contextOrg.source.external.aaa.foo");
     assert topics.contains("i-am-very-special");
     assert topics.contains("i-am-more-special");
+
+    kafkaAdminClient.close(Duration.ZERO);
   }
 }

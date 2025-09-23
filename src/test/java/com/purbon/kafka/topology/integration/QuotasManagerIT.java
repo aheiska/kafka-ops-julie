@@ -22,6 +22,7 @@ import com.purbon.kafka.topology.roles.SimpleAclsProvider;
 import com.purbon.kafka.topology.roles.acls.AclsBindingsBuilder;
 import com.purbon.kafka.topology.utils.TestUtils;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -91,6 +92,11 @@ public class QuotasManagerIT {
     aclsProvider = new SimpleAclsProvider(topologyAdminClient);
 
     accessControlManager = new AccessControlManager(aclsProvider, bindingsBuilder, config);
+  }
+
+  @After
+  public void tearDown() {
+    kafkaAdminClient.close(Duration.ZERO);
   }
 
   private Topology woldMSpecPattern() {

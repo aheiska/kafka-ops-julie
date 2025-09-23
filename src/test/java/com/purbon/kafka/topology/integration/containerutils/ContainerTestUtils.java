@@ -10,6 +10,7 @@ import com.purbon.kafka.topology.roles.acls.AclsBindingsBuilder;
 import com.purbon.kafka.topology.utils.TestUtils;
 import com.typesafe.config.ConfigFactory;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.*;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.admin.AdminClient;
@@ -123,6 +124,7 @@ public final class ContainerTestUtils {
     AdminClient admin = getSaslSuperUserAdminClient(container.getBootstrapServers());
     clearAllAcls(admin);
     setupJulieAcls(admin);
+    admin.close(Duration.ZERO);
   }
 
   private static void clearAllAcls(AdminClient admin) {

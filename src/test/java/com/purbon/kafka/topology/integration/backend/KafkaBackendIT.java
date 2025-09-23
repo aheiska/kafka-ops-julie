@@ -12,6 +12,8 @@ import com.purbon.kafka.topology.integration.containerutils.ContainerFactory;
 import com.purbon.kafka.topology.integration.containerutils.ContainerTestUtils;
 import com.purbon.kafka.topology.integration.containerutils.SaslPlaintextKafkaContainer;
 import com.purbon.kafka.topology.roles.TopologyAclBinding;
+
+import java.time.Duration;
 import java.util.*;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.NewTopic;
@@ -123,6 +125,7 @@ public class KafkaBackendIT {
       Assert.assertTrue(
           "Unexpected exception", e.getMessage().contains(TopicConfig.CLEANUP_POLICY_COMPACT));
     }
+    admin.close(Duration.ZERO);
   }
 
   @Test

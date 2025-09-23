@@ -27,6 +27,7 @@ import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.*;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.common.acl.AclPermissionType;
@@ -45,8 +46,8 @@ public class RedisBackendIT {
       new GenericContainer<>(DockerImageName.parse("redis:7.2.4")).withExposedPorts(6379);
 
   private static SaslPlaintextKafkaContainer container;
+  private static AdminClient kafkaAdminClient;
   private TopicManager topicManager;
-  private AdminClient kafkaAdminClient;
 
   private ExecutionPlan plan;
 
@@ -59,11 +60,13 @@ public class RedisBackendIT {
     bucket = "bucket";
     container = ContainerFactory.fetchSaslKafkaContainer(System.getProperty("cp.version"));
     container.start();
+    kafkaAdminClient = ContainerTestUtils.getSaslJulieAdminClient(container);
     ContainerTestUtils.resetAcls(container);
   }
 
   @AfterClass
   public static void teardown() {
+    kafkaAdminClient.close(Duration.ZERO);
     container.stop();
   }
 
@@ -71,7 +74,6 @@ public class RedisBackendIT {
   public void before() throws IOException {
     Files.deleteIfExists(Paths.get(".cluster-state"));
 
-    kafkaAdminClient = ContainerTestUtils.getSaslJulieAdminClient(container);
     TopologyBuilderAdminClient adminClient = new TopologyBuilderAdminClient(kafkaAdminClient);
 
     final SchemaRegistryClient schemaRegistryClient = new MockSchemaRegistryClient();

@@ -27,6 +27,7 @@ import com.purbon.kafka.topology.roles.TopologyAclBinding;
 import com.purbon.kafka.topology.roles.acls.AclsBindingsBuilder;
 import com.purbon.kafka.topology.utils.TestUtils;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -79,6 +80,11 @@ public class AccessControlManagerIT {
     aclsProvider = new SimpleAclsProvider(topologyAdminClient);
     bindingsBuilder = new AclsBindingsBuilder(config);
     accessControlManager = new AccessControlManager(aclsProvider, bindingsBuilder);
+  }
+
+  @After
+  public void tearDown() {
+    kafkaAdminClient.close(Duration.ZERO);
   }
 
   @Test

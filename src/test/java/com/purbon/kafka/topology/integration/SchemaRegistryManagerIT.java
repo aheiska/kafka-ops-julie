@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.*;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.junit.*;
@@ -42,11 +43,13 @@ public class SchemaRegistryManagerIT {
   private ExecutionPlan plan;
 
   private SchemaRegistryClient schemaRegistryClient;
+  private static AdminClient kafkaAdminClient;
 
   @BeforeClass
   public static void setup() {
     container = ContainerFactory.fetchSaslKafkaContainer(System.getProperty("cp.version"));
     container.start();
+    kafkaAdminClient = ContainerTestUtils.getSaslJulieAdminClient(container);
     ContainerTestUtils.resetAcls(container);
     schemaRegistryContainer = new SchemaRegistryContainer(container);
     schemaRegistryContainer.start();
@@ -56,6 +59,7 @@ public class SchemaRegistryManagerIT {
   public static void after() {
     schemaRegistryContainer.stop();
     container.stop();
+    kafkaAdminClient.close(Duration.ZERO);
   }
 
   @Before
@@ -88,7 +92,6 @@ public class SchemaRegistryManagerIT {
 
   @Test
   public void testSchemaSetupForAvroDefaults() throws IOException, RestClientException {
-    AdminClient kafkaAdminClient = ContainerTestUtils.getSaslJulieAdminClient(container);
     TopologyBuilderAdminClient adminClient = new TopologyBuilderAdminClient(kafkaAdminClient);
 
     File file = TestUtils.getResourceFile("/descriptor-schemas-avro.yaml");
@@ -109,7 +112,6 @@ public class SchemaRegistryManagerIT {
 
   @Test
   public void testSchemaSetupForJsonDefaults() throws IOException, RestClientException {
-    AdminClient kafkaAdminClient = ContainerTestUtils.getSaslJulieAdminClient(container);
     TopologyBuilderAdminClient adminClient = new TopologyBuilderAdminClient(kafkaAdminClient);
 
     File file = TestUtils.getResourceFile("/descriptor-schemas-json.yaml");
@@ -127,7 +129,6 @@ public class SchemaRegistryManagerIT {
 
   @Test
   public void testSchemaSetupForProtoBufDefaults() throws IOException, RestClientException {
-    AdminClient kafkaAdminClient = ContainerTestUtils.getSaslJulieAdminClient(container);
     TopologyBuilderAdminClient adminClient = new TopologyBuilderAdminClient(kafkaAdminClient);
 
     File file = TestUtils.getResourceFile("/descriptor-schemas-proto.yaml");
@@ -145,7 +146,6 @@ public class SchemaRegistryManagerIT {
 
   @Test
   public void testSchemaSetupWithContentInUTF() throws IOException, RestClientException {
-    AdminClient kafkaAdminClient = ContainerTestUtils.getSaslJulieAdminClient(container);
     TopologyBuilderAdminClient adminClient = new TopologyBuilderAdminClient(kafkaAdminClient);
 
     File file = TestUtils.getResourceFile("/descriptor-schemas-utf.yaml");
