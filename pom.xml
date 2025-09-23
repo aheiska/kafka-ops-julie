@@ -198,7 +198,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.11.3</version>
+        <version>3.12.0</version>
         <executions>
           <execution>
             <id>attach-javadocs</id>
@@ -271,12 +271,12 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- plugins -->
-    <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
+    <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
     <maven-failsafe-plugin.version>3.5.4</maven-failsafe-plugin.version>
     <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
     <!-- dependencies -->
-    <assertj.version>3.27.4</assertj.version>
-    <aws.java.sdk.version>2.33.12</aws.java.sdk.version>
+    <assertj.version>3.27.5</assertj.version>
+    <aws.java.sdk.version>2.34.0</aws.java.sdk.version>
     <commons.version>1.10.0</commons.version>
     <confluent.version>8.0.0</confluent.version>
     <gcp.java.sdk.version>26.68.0</gcp.java.sdk.version>
@@ -289,7 +289,7 @@
     <ksqldb.version>0.27.1</ksqldb.version>
     <log4j.version>2.25.1</log4j.version>
     <lombok.version>1.18.42</lombok.version>
-    <mockito.version>5.19.0</mockito.version>
+    <mockito.version>5.20.0</mockito.version>
     <slf4j.version>2.0.17</slf4j.version>
     <testcontainers.version>1.21.3</testcontainers.version>
     <typesafe.version>1.4.5</typesafe.version>
